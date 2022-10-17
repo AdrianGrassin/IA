@@ -18,10 +18,12 @@ int main(int argc, char *argv[]) {
   G.print();
   int v1 = 0;
   int v2 = 0;
-  std::cout << "Insert two vertex from 1 to " << G.getNumVertex() << std::endl;
+  std::cout << "Introduce dos nodos del grafo del 1 al " << G.getNumVertex() << ":" <<std::endl;
   std::cin >> v1 >> v2;
+  std::cout << std::endl;
   G.bfs(v1 - 1, v2 - 1);
+  std::cout << std::endl;
+  G.dijkstra(v1 - 1, v2 - 1);
 
   return 0;
 }
-
