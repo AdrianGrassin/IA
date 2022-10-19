@@ -15,10 +15,9 @@ int main(int argc, char *argv[]) {
   }
 
   Graph G(file);
-  G.print();
   int v1 = 0;
   int v2 = 0;
-  std::cout << "Insert two vertex from 1 to " << G.getNumVertex() << std::endl;
+  std::cout << "Inserta el nodo inicial y el nodo final del camino: [1 - " << G.getNumVertex() << "]:" << std::endl;
   std::cin >> v1 >> v2;
   G.bfs(v1 - 1, v2 - 1);
 

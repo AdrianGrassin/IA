@@ -10,8 +10,9 @@
 #include <vector>
 #include <algorithm>
 #include <queue>
-
-using namespace std;
+#include <iomanip>
+#include <set>
+#include <stack>
 
 class Graph {
  public:
@@ -22,9 +23,10 @@ class Graph {
   void bfs(int v1, int v2) const;
 
   int getNumVertex() const;
+
  private:
-  int numVertex{};
-  vector<vector<int>> adjMatrix;
+  int num_vertices;
+  std::vector<std::vector<int>> mat_ad;
 };
 
 #endif

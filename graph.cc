@@ -1,95 +1,120 @@
-#include <iomanip>
 #include "graph.h"
 
 Graph::Graph(std::ifstream &file) {
-  file >> numVertex;
-  adjMatrix.resize(numVertex);
-  for (int i = 0; i < numVertex; i++) {
-    adjMatrix[i].resize(numVertex);
+  file >> num_vertices;
+  mat_ad.resize(num_vertices);
+  for (int i = 0; i < num_vertices; i++) {
+    mat_ad[i].resize(num_vertices);
   }
-  for (int i = 0; i < numVertex; i++) {
-    for (int j = i; j < numVertex; j++) {
+  for (int i = 0; i < num_vertices; i++) {
+    for (int j = i; j < num_vertices; j++) {
       if (i == j) {
-        adjMatrix[i][j] = 0;
+        mat_ad[i][j] = 0;
         continue;
       }
       int weight;
       std::string str;
       file >> str;
       weight = std::stoi(str);
-      adjMatrix[i][j] = weight;
-      adjMatrix[j][i] = adjMatrix[i][j];
+      mat_ad[i][j] = weight;
+      mat_ad[j][i] = mat_ad[i][j];
 
     }
   }
 }
 
 Graph::~Graph() {
-  for (int i = 0; i < numVertex; i++) {
-    adjMatrix[i].clear();
+  for (int i = 0; i < num_vertices; i++) {
+    mat_ad[i].clear();
   }
-  adjMatrix.clear();
+  mat_ad.clear();
 }
 
 void Graph::print() const {
-  cout << "Graph G:" << endl;
+  std::cout << "Graph G:" << std::endl;
 
-  for (int i = 0; i < numVertex; i++) {
-    for (int j = 0; j < numVertex; j++) {
-      cout << setw(3) << adjMatrix[i][j] << " ";
+  for (int i = 0; i < num_vertices; i++) {
+    for (int j = 0; j < num_vertices; j++) {
+      std::cout << std::setw(3) << mat_ad[i][j] << " ";
     }
-    cout << endl;
+    std::cout << std::endl;
   }
 }
 
 void Graph::bfs(int v1, int v2) const {
-  if (v1 < 0 || v2 < 0 || v1 >= numVertex || v2 >= numVertex) {
-    cout << "Invalid vertex" << endl;
+  if (v1 < 0 || v1 >= num_vertices || v2 < 0 || v2 >= num_vertices) {
+    std::cout << "Nodo no valido" << std::endl;
     return;
   }
 
-  vector<int> visited(numVertex, 0);
-  vector<int> parent(numVertex, -1);
-  vector<int> cost(numVertex, 0);
-  queue<int> q;
-  q.push(v1);
-  visited[v1] = 1;
-  while (!q.empty()) {
-    int u = q.front();
-    q.pop();
-    for (int i = 0; i < numVertex; i++) {
-      if (adjMatrix[u][i] != -1 && visited[i] == 0) {
-        q.push(i);
-        visited[i] = 1;
-        parent[i] = u;
-        cost[i] = cost[u] + adjMatrix[u][i];
+  std::set<int> visitados;
+  std::vector<int> padre(num_vertices, -1);
+
+  std::queue<int> cola;
+  int distancia = 0;
+  int c_visitados = 0;
+  int c_generados = 0;
+
+  // nodo padre
+  padre[v1] = v1;
+  cola.push(v1);
+  while (!cola.empty()) {
+    int nodo = cola.front();
+    c_visitados++;
+    visitados.insert(nodo);
+    if (nodo == v2) {
+      break;
+    }
+    for (int i = 0; i < num_vertices; i++) {
+      if (mat_ad[nodo][i] != -1 && visitados.count(i) == 0) {
+        cola.push(i);
+        padre[i] = nodo;
+        c_generados++;  // los nodos generados no incluyen repeticiones
       }
     }
-  }
-  if (visited[v2] == 0) {
-    cout << "There is no path from " << v1 + 1 << " to " << v2 + 1 << endl;
-    return;
-  }
-  vector<int> path;
-  int u = v2;
-  while (parent[u] != -1) {
-    path.push_back(u);
-    u = parent[u];
+    cola.pop();
   }
 
-  path.push_back(v1);
-  reverse(path.begin(), path.end());
-  cout << "Path: ";
-  for (int i : path) {
-    cout << "->" <<  i + 1;
+  int nodo = v2;
+  std::stack<int> camino;
+  do {
+    camino.push(nodo + 1);
+    distancia += mat_ad[nodo][padre[nodo]];
+    nodo = padre[nodo];
+
+    if (nodo == -1) {
+      std::cout << "No hay camino entre los nodos: [" << v1 << "] y [" << v2 << "]" << std::endl;
+      return;
+    }
+  } while ((nodo != v1));
+  camino.push(v1 + 1);
+
+  std::string str;
+  while (!camino.empty()) {
+    str += std::to_string(camino.top());
+    camino.pop();
+    if (!camino.empty()) {
+      str += " -> ";
+    }
   }
-  cout << endl;
-  cout << "Total cost: " << cost[v2] << endl;
+
+  std::ofstream file;
+  file.open("output.csv", std::ios::app);
+  file << v1 + 1 << "," << v2 + 1 << "," <<  str << "," << distancia << "," << c_visitados << "," << c_generados << "," << std::endl;
+  file.flush();
+  file.close();
+
+
+  std::cout << std::endl;
+  std::cout << "Camino: " << str << std::endl;
+  std::cout << "Distancia: " << distancia << std::endl;
+  std::cout << "Nodos visitados: " << c_visitados << std::endl;
+  std::cout << "Nodos generados: " << c_generados << std::endl;
 
 }
 
 int Graph::getNumVertex() const {
-  return numVertex;
+  return num_vertices;
 }
 
 
