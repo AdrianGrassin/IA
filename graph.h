@@ -21,6 +21,8 @@ class Graph {
 
   void print() const;
   void bfs(int v1, int v2) const;
+  void dijkstra(int v1, int v2) const;
+  void bellmanFord(int v1, int v2) const;
 
   int getNumVertex() const;
 
